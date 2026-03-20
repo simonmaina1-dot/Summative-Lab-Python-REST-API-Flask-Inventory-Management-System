@@ -1,9 +1,7 @@
 import click
 import requests
 import uuid
-from app import inventory  # Shared in-memory for simplicity (in production, use proper DB)
 from api_utils import fetch_product
-from models import InventoryItem
 
 BASE_URL = 'http://127.0.0.1:5000'
 

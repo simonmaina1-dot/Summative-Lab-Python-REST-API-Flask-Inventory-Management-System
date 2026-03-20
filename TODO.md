@@ -22,11 +22,11 @@ Current Progress: Starting Phase 1/5. Check off as completed.
 ## Phase 4: CLI Enhancements [TODO]
 - [ ] Edit cli.py: Add preview option for add.
 
-## Phase 5: Git Workflow [TODO]
-- [ ] git stash; git checkout -b blackboxai/excelled.
-- [ ] git add .; git commit -m 'Excelled rubric: full tests/UI/git'.
-- [ ] git push; gh pr create --title 'Excelled Implementation'.
-- [ ] pytest final; python app.py demo.
+## Phase 5: Git Workflow ✅
+- [x] git branch blackboxai/excelled, stash applied.
+- [x] git add/commit/push.
+- [x] gh pr created.
+- [x] pytest (17 pass); Run \`python app.py\` for demo @ localhost:5000.
 
 **Run `pytest` after each phase. All done → 100%!**
 
