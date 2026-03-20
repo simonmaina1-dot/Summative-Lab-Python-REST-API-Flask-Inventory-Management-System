@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head><title>Inventory</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Inventory Management</h1>
+    <form id="lookupForm">
+        <input type="text" id="query" placeholder="Barcode or name" required>
+        <button type="submit">Lookup & Add</button>
+    </form>
+    <div id="preview"></div>
+    <h2>Current Inventory</h2>
+    <ul id="inventory">
+        <!-- Dynamic via JS -->
+    </ul>
+    <script>
+        // Load initial inventory
+        fetch('/inventory').then(r => r.json()).then(items => {
+            const ul = document.getElementById("inventory");
+            items.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = `${item.product_name} (ID: ${item.id}, Stock: ${item.stock}, Price: $${item.price})`;
+                ul.appendChild(li);
+            });
+        });
+
+        document.getElementById("lookupForm").onsubmit = async (e) => {
+            e.preventDefault();
+            const query = document.getElementById("query").value;
+            const res = await fetch(`/lookup/${encodeURIComponent(query)}`);
+            const preview = document.getElementById("preview");
+            if (res.ok) {
+                const data = await res.json();
+                preview.innerHTML = `
+                    <h3>Preview:</h3>
+                    <p>${data.product_name || 'Unknown'} - Brands: ${data.brands || 'N/A'}<br>
+                    Stock: <input id="stock" value="0" type="number" min="0"> 
+                    Price: <input id="price" value="${data.price || 0}" type="number" step="0.01" min="0"></p>
+                    <button onclick="addItem('${data.product_name || query}', '${data.barcode || ''}')">Add to Inventory</button>
+                `;
+            } else {
+                preview.innerHTML = "<p>Product not found</p>";
+            }
+        };
+        window.addItem = async (name, barcode) => {
+            const stockVal = document.getElementById("stock").value;
+            const priceVal = document.getElementById("price").value;
+            const res = await fetch("/inventory", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({product_name: name, barcode, stock: parseInt(stockVal), price: parseFloat(priceVal)})
+            });
+            if (res.ok) {
+                location.reload();
+            }
+        };
+    </script>
+</body>
+</html>
