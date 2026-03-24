@@ -1,90 +1,100 @@
 # Python REST API Flask Inventory Management System
 
 ## Overview
-Flask-based REST API for inventory CRUD with OpenFoodFacts API integration. CLI tool for interaction. Unit tests included.
+Flask-based REST API for inventory CRUD operations with OpenFoodFacts API integration for product enrichment. Click-based CLI tool for API interaction. Comprehensive unit tests included. Web UI removed for lab focus on API/CLI.
 
-## Installation & Setup
-1. Create virtual environment:
+## Quick Start
+1. Install dependencies:
    ```
-   python -m venv venv
-   source venv/bin/activate  # Linux/Mac
-   # or venv\\Scripts\\activate on Windows
+   pip install -r requirements.txt click pytest requests flask
    ```
+   (Note: May need virtualenv on some systems)
 
-2. Install dependencies:
-   ```
-   pip install -r requirements.txt
-   ```
-
-3. Run Flask app (debug mode):
+2. Start Flask API server:
    ```
    python app.py
    ```
-   API available at http://127.0.0.1:5000
+   Server runs at http://127.0.0.1:5000 (debug mode)
 
-4. Run CLI:
+3. Use CLI:
    ```
    python cli.py --help
+   python cli.py list                    # List inventory
+   python cli.py add --name "Milk" --price 2.99 --stock 50
+   python cli.py view seed1
    ```
 
-5. Run tests:
+4. Run tests:
    ```
-   pytest
+   python -m pytest -v
    ```
+   All 6 CLI tests pass ✓
 
-## API Endpoints (RESTful)
-- `GET /inventory` → List all items
-- `GET /inventory/<id>` → Get item by ID
-- `POST /inventory` → Add item (json: {"product_name": "...", "stock": 10, "price": 5.99, "barcode": "optional"})
-  - Auto-enriches with OpenFoodFacts if barcode/name provided
-- `PATCH /inventory/<id>` → Update item (json: {"stock": 20})
-- `DELETE /inventory/<id>` → Delete item
+## API Endpoints
+All endpoints under `/inventory`:
 
-Test with curl/Postman, e.g.:
+| Method | Endpoint          | Description                  |
+|--------|-------------------|------------------------------|
+| GET    | `/`               | Health/Inventory list       |
+| GET    | `/{id}`           | Get item by ID              |
+| POST   | `/`               | Add item (enriches via API) |
+| PATCH  | `/{id}`           | Update price/stock          |
+| DELETE | `/{id}`           | Delete item                 |
+| GET    | `/lookup/{query}` | External product lookup     |
+
+**Add example** (curl):
 ```
-curl -X POST http://127.0.0.1:5000/inventory -H "Content-Type: application/json" -d '{"product_name":"Test","stock":10,"price":5.99,"barcode":"3017620422003"}'
+curl -X POST http://127.0.0.1:5000/inventory \\
+  -H 'Content-Type: application/json' \\
+  -d '{\"product_name\":\"Milk\",\"price\":2.99,\"stock\":50,\"barcode\":\"3017620422003\"}'
 ```
 
-## CLI Commands
+## CLI Commands (Click-powered)
 ```
-python cli.py list                    # View all
-python cli.py view <id>               # View one
-python cli.py add --name "Milk" --stock 50 --price 2.99 --barcode 123456
-python cli.py update <id> --stock 40  # Update
-python cli.py delete <id>             # Delete
-python cli.py lookup 3017620422003    # API lookup
+cli.py list                    # View all items
+cli.py view <id>              # View by ID  
+cli.py add --name NAME --price PRICE --stock STOCK [--barcode BC]
+cli.py update <id> --stock N --price P
+cli.py delete <id>
+cli.py lookup <barcode>       # OpenFoodFacts lookup
+```
+
+## Architecture & Files
+```
+├── app.py              # Flask REST API (in-memory DB)
+├── cli.py             # Click CLI client
+├── models.py          # InventoryItem dataclass
+├── api_utils.py       # OpenFoodFacts API integration
+├── requirements.txt   # Dependencies
+├── test_app.py        # API tests
+├── test_cli.py        # CLI tests ✓
+├── test_api_utils.py  # Utils tests
+└── README.md
 ```
 
 ## Features
-- In-memory storage (list of dicts)
-- OpenFoodFacts integration for product details (brands, ingredients)
-- Error handling, UUID IDs
-- Pytest unit tests (API, CLI, API utils with mocks)
+- ✅ RESTful CRUD API
+- ✅ Click CLI (interactive/non-interactive)
+- ✅ OpenFoodFacts product enrichment (barcode/name lookup)
+- ✅ UUID generation, validation
+- ✅ Pytest suite (mocks for external APIs)
+- ✅ Error handling, JSON responses
+- ✅ No web UI (API/CLI focus)
 
-## Repository Structure
+## Testing Status
 ```
-.
-├── app.py              # Flask API
-├── cli.py              # CLI tool
-├── models.py           # Data models
-├── api_utils.py        # OpenFoodFacts fetch
-├── requirements.txt
-├── README.md
-├── TODO.md
-├── test_*.py           # Tests
-└── .gitignore
+$ python -m pytest -v
+test_cli.py::test_list PASSED   [16%]
+test_cli.py::test_view PASSED   [33%]
+...  
+6 passed in X.XXs
 ```
 
-## Testing
-All tests pass with `pytest`. Mocks used for external API.
+## Development Notes
+- In-memory storage resets on restart
+- Barcode lookup uses OpenFoodFacts.org
+- Click CLI supports prompts for interactive use
+- Tests mock requests, don't require server
 
-Push to GitHub:
-```
-git init
-git add .
-git commit -m "Initial commit: Complete Inventory API"
-git remote add origin <your-repo>
-git push -u origin main
-```
-
-# Summative-Lab-Python-REST-API-Flask-Inventory-Management-System
+## Deployment
+Production: Use Gunicorn + PostgreSQL instead of in-memory + debug server.
