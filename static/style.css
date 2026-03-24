@@ -1,9 +1,0 @@
-body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
-h1, h2 { color: #333; }
-form { margin-bottom: 20px; }
-input, button { padding: 10px; margin: 5px; }
-#preview { border: 1px solid #ddd; padding: 15px; margin: 10px 0; background: #f9f9f9; }
-ul { list-style: none; padding: 0; }
-li { padding: 10px; border-bottom: 1px solid #eee; }
-button { background: #4CAF50; color: white; border: none; cursor: pointer; }
-button:hover { background: #45a049; }
